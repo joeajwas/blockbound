@@ -148,7 +148,16 @@
       background: linear-gradient(90deg, var(--danger), var(--success));
     }
     #uptime-bar { background: var(--success); }
-    #motd { padding: 18px; background: rgba(0,0,0,0.55); border-radius: 14px; margin: 25px 0; font-size: 1.25em; line-height: 1.5; transition: all 0.6s ease; }
+    #motd { 
+      padding: 18px; 
+      background: rgba(0,0,0,0.55); 
+      border-radius: 14px; 
+      margin: 25px 0; 
+      font-size: 1.25em; 
+      line-height: 1.5; 
+      transition: all 0.6s ease; 
+      word-break: break-all;
+    }
     #player-list { margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.35); border-radius: 12px; font-size: 1.15em; transition: all 0.5s; }
     #last-update { text-align: center; font-size: 1.1em; opacity: 0.85; margin: 40px 0; transition: opacity 0.8s; }
     button {
@@ -167,6 +176,48 @@
     }
     button:hover { background: #00e6e6; transform: scale(1.1); box-shadow: 0 15px 40px rgba(0,255,255,0.6); }
     #chart-container { background: var(--card); border-radius: 20px; padding: 35px; box-shadow: var(--glow); margin-bottom: 60px; }
+
+    /* ── New stylish connection info styles ── */
+    .connection-info {
+      margin-top: 20px;
+      padding: 16px;
+      background: rgba(0, 255, 255, 0.08);
+      border-radius: 12px;
+      border: 1px solid rgba(0, 255, 255, 0.25);
+      transition: all 0.4s ease;
+    }
+    .connection-info:hover {
+      background: rgba(0, 255, 255, 0.14);
+      box-shadow: 0 0 25px rgba(0, 255, 255, 0.25);
+    }
+    .ip-line {
+      display: flex;
+      align-items: center;
+      margin: 12px 0;
+      font-size: 1.1em;
+      gap: 10px;
+    }
+    .ip-line span.label {
+      min-width: 110px;
+      font-weight: bold;
+      color: #aaaaff;
+    }
+    .ip-line span.value {
+      color: var(--accent);
+      cursor: pointer;
+      text-decoration: underline dotted;
+      transition: all 0.3s;
+    }
+    .ip-line span.value:hover {
+      color: #ffffff;
+      text-shadow: 0 0 12px var(--accent);
+    }
+    .ip-line span.copy-hint {
+      font-size: 0.85em;
+      color: #8888ff;
+      margin-left: 8px;
+      opacity: 0.7;
+    }
   </style>
 </head>
 <body>
@@ -214,7 +265,22 @@
         <h2>Server Information</h2>
         <p>IP: <span id="server-ip" style="color: var(--accent); cursor: pointer;" onclick="navigator.clipboard.writeText('blockbound.mc-play.org'); alert('IP Copied!')">blockbound.mc-play.org</span></p>
         <div id="motd">Loading MOTD...</div>
+
+        <!-- New stylish connection block -->
+        <div class="connection-info">
+          <div class="ip-line">
+            <span class="label">Java IP:</span>
+            <span class="value" onclick="navigator.clipboard.writeText('blockbound.mc-play.org'); alert('Java IP Copied!')">blockbound.mc-play.org</span>
+            <span class="copy-hint">(click to copy)</span>
+          </div>
+          <div class="ip-line">
+            <span class="label">Bedrock/PE:</span>
+            <span class="value" onclick="navigator.clipboard.writeText('blockbound.mc-play.org:20017'); alert('Bedrock IP + Port Copied!')">blockbound.mc-play.org <small>port 20017</small></span>
+            <span class="copy-hint">(click to copy)</span>
+          </div>
+        </div>
       </div>
+
       <div class="section">
         <h2>Live Statistics</h2>
         <p>Response Time: <span id="response-time">—</span> ms</p>
@@ -225,9 +291,11 @@
       </div>
     </div>
 
-    <div id="chart-container" id="charts">
-      <h2>Recent Uptime Flow</h2>
-      <canvas id="uptimeChart"></canvas>
+    <div id="charts">
+      <div id="chart-container">
+        <h2>Recent Uptime Flow</h2>
+        <canvas id="uptimeChart"></canvas>
+      </div>
     </div>
 
     <div id="last-update">Last checked: just now</div>
