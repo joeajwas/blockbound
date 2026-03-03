@@ -44,8 +44,22 @@
       transition: all 0.6s ease;
     }
     .logo { font-size: 1.7em; font-weight: bold; color: var(--accent); text-shadow: var(--glow); }
-    nav a { color: var(--text); margin: 0 22px; text-decoration: none; transition: all 0.4s ease; }
-    nav a:hover { color: var(--accent); transform: translateY(-2px); text-shadow: var(--glow); }
+    nav a { 
+      color: var(--text); 
+      margin: 0 22px; 
+      text-decoration: none; 
+      transition: all 0.4s ease; 
+    }
+    nav a:hover { 
+      color: var(--accent); 
+      transform: translateY(-2px); 
+      text-shadow: var(--glow); 
+    }
+    nav a.active {
+      color: #00ffff !important;
+      text-shadow: 0 0 15px #00ffff;
+      font-weight: bold;
+    }
     .discord-btn {
       padding: 10px 25px;
       background: #5865F2;
@@ -173,7 +187,7 @@
   </div>
 
   <div class="container">
-    <div class="stats-grid">
+    <div class="stats-grid" id="status">
       <div class="card">
         <div class="card-title">Server Status</div>
         <div class="card-value">
@@ -195,14 +209,14 @@
       </div>
     </div>
 
-    <div class="sections-grid">
-      <div class="section">
+    <div class="sections-grid" id="players">
+      <div class="section" id="info">
         <h2>Server Information</h2>
         <p>IP: <span id="server-ip" style="color: var(--accent); cursor: pointer;" onclick="navigator.clipboard.writeText('blockbound.mc-play.org'); alert('IP Copied!')">blockbound.mc-play.org</span></p>
         <div id="motd">Loading MOTD...</div>
       </div>
       <div class="section">
-        <h2>Live Stats</h2>
+        <h2>Live Statistics</h2>
         <p>Response Time: <span id="response-time">—</span> ms</p>
         <div class="bar-container"><div id="response-bar" class="bar"></div></div>
         <p>Uptime Flow:</p>
@@ -211,7 +225,7 @@
       </div>
     </div>
 
-    <div id="chart-container">
+    <div id="chart-container" id="charts">
       <h2>Recent Uptime Flow</h2>
       <canvas id="uptimeChart"></canvas>
     </div>
@@ -292,6 +306,42 @@
 
     checkServer();
     setInterval(checkServer, 30000);
+
+    // Smooth scrolling for nav links
+    document.querySelectorAll('nav a').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href').substring(1);
+        const targetElement = document.getElementById(targetId);
+        if (targetElement) {
+          targetElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        } else {
+          console.warn(`Section not found: #${targetId}`);
+        }
+      });
+    });
+
+    // Highlight active nav link on scroll
+    window.addEventListener('scroll', () => {
+      const sections = ['status', 'players', 'info', 'charts'];
+      let current = '';
+      sections.forEach(sectionId => {
+        const section = document.getElementById(sectionId);
+        if (section && window.scrollY >= section.offsetTop - 150) {
+          current = sectionId;
+        }
+      });
+      document.querySelectorAll('nav a').forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === `#${current}`) {
+          link.classList.add('active');
+        }
+      });
+    });
+
   </script>
 </body>
 </html>
