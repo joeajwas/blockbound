@@ -7,118 +7,152 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
-      --bg: linear-gradient(135deg, #0a001f 0%, #1a0033 100%);
-      --card-bg: rgba(20, 20, 50, 0.85);
+      --bg-start: #0a001f;
+      --bg-end: #1a0033;
       --accent: #00ffff;
       --success: #00ff88;
       --danger: #ff4444;
-      --purple: #9d4edd;
       --text: #e0e0ff;
-      --shadow: 0 10px 40px rgba(0, 255, 255, 0.15);
+      --card: rgba(20, 20, 50, 0.88);
+      --glow: 0 0 25px rgba(0, 255, 255, 0.4);
     }
     body {
       margin: 0;
       font-family: 'Segoe UI', system-ui, sans-serif;
-      background: var(--bg);
+      background: linear-gradient(-45deg, var(--bg-start), var(--bg-end), #2a004d, #0f002e);
+      background-size: 400% 400%;
+      animation: flowBg 20s ease infinite;
       color: var(--text);
       min-height: 100vh;
-      animation: fadeIn 1.2s ease-out;
     }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes flowBg {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
     header {
-      background: rgba(0,0,0,0.6);
-      backdrop-filter: blur(10px);
+      background: rgba(0,0,0,0.65);
+      backdrop-filter: blur(12px);
       padding: 15px 30px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       position: sticky;
       top: 0;
-      z-index: 10;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      z-index: 20;
+      box-shadow: 0 6px 25px rgba(0,0,0,0.6);
+      transition: all 0.6s ease;
     }
-    .logo { font-size: 1.6em; font-weight: bold; color: var(--accent); text-shadow: 0 0 15px var(--accent); }
-    nav a { color: var(--text); margin: 0 20px; text-decoration: none; transition: color 0.3s; }
-    nav a:hover { color: var(--accent); }
+    .logo { font-size: 1.7em; font-weight: bold; color: var(--accent); text-shadow: var(--glow); }
+    nav a { color: var(--text); margin: 0 22px; text-decoration: none; transition: all 0.4s ease; }
+    nav a:hover { color: var(--accent); transform: translateY(-2px); text-shadow: var(--glow); }
     .discord-btn {
       padding: 10px 25px;
       background: #5865F2;
-      border-radius: 8px;
+      border-radius: 10px;
       color: white;
       font-weight: bold;
       text-decoration: none;
-      box-shadow: 0 4px 15px rgba(88,101,242,0.5);
-      transition: all 0.3s;
+      box-shadow: 0 5px 18px rgba(88,101,242,0.5);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-    .discord-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(88,101,242,0.6); }
+    .discord-btn:hover { transform: scale(1.08) translateY(-3px); box-shadow: 0 10px 30px rgba(88,101,242,0.7); }
     .hero {
       text-align: center;
-      padding: 60px 20px 40px;
-      background: linear-gradient(to bottom, rgba(0,255,255,0.05), transparent);
+      padding: 80px 20px 50px;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: flowIn 1.2s forwards 0.3s ease-out;
     }
-    h1 { font-size: 3.5em; margin: 0; color: var(--accent); text-shadow: 0 0 30px var(--accent); }
-    .subtitle { font-size: 1.4em; opacity: 0.85; margin: 15px 0; }
-    .container { max-width: 1300px; margin: 0 auto; padding: 0 20px; }
+    @keyframes flowIn { to { opacity: 1; transform: translateY(0); } }
+    h1 { font-size: 4em; margin: 0; color: var(--accent); text-shadow: var(--glow); }
+    .subtitle { font-size: 1.5em; opacity: 0.9; margin: 15px 0; letter-spacing: 1px; }
+    .container { max-width: 1350px; margin: 0 auto; padding: 0 25px; }
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 25px;
-      margin: 40px 0;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 30px;
+      margin: 50px 0;
     }
     .card {
-      background: var(--card-bg);
-      border-radius: 16px;
-      padding: 25px;
+      background: var(--card);
+      border-radius: 20px;
+      padding: 30px;
       text-align: center;
-      box-shadow: var(--shadow);
-      border: 1px solid rgba(0,255,255,0.1);
-      transition: all 0.4s ease;
+      box-shadow: var(--glow);
+      border: 1px solid rgba(0,255,255,0.12);
+      opacity: 0;
+      transform: translateY(40px);
+      animation: cardFlow 0.8s forwards ease-out;
+      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
+    .card:nth-child(1) { animation-delay: 0.2s; }
+    .card:nth-child(2) { animation-delay: 0.4s; }
+    .card:nth-child(3) { animation-delay: 0.6s; }
+    .card:nth-child(4) { animation-delay: 0.8s; }
+    @keyframes cardFlow { to { opacity: 1; transform: translateY(0); } }
     .card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 20px 60px rgba(0,255,255,0.25);
+      transform: translateY(-12px) scale(1.04);
+      box-shadow: 0 25px 70px rgba(0,255,255,0.35);
       border-color: var(--accent);
     }
-    .card-title { font-size: 1.1em; opacity: 0.75; margin-bottom: 12px; }
-    .card-value { font-size: 2.2em; font-weight: bold; }
-    .status-dot { font-size: 2.5em; margin-right: 10px; }
+    .card-title { font-size: 1.15em; opacity: 0.8; margin-bottom: 15px; }
+    .card-value { font-size: 2.5em; font-weight: bold; transition: all 0.6s ease; }
+    .status-dot { font-size: 3em; animation: pulseGlow 3s infinite ease-in-out; }
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.8; text-shadow: 0 0 20px currentColor; }
+      50% { opacity: 1; text-shadow: 0 0 40px currentColor; }
+    }
     .online { color: var(--success); }
     .offline { color: var(--danger); }
     .sections-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-      gap: 30px;
-      margin: 50px 0;
+      grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+      gap: 35px;
+      margin: 60px 0;
     }
     .section {
-      background: var(--card-bg);
-      border-radius: 16px;
-      padding: 30px;
-      box-shadow: var(--shadow);
+      background: var(--card);
+      border-radius: 20px;
+      padding: 35px;
+      box-shadow: var(--glow);
+      transition: all 0.5s ease;
     }
-    .bar-container { background: rgba(0,0,0,0.4); border-radius: 8px; height: 12px; margin: 10px 0; overflow: hidden; }
-    .bar { height: 100%; border-radius: 8px; transition: width 1.5s ease; }
-    #response-bar { background: linear-gradient(to right, var(--danger), var(--success)); }
+    .section:hover { box-shadow: 0 20px 60px rgba(0,255,255,0.3); }
+    .bar-container {
+      background: rgba(0,0,0,0.45);
+      border-radius: 10px;
+      height: 14px;
+      margin: 12px 0;
+      overflow: hidden;
+    }
+    .bar {
+      height: 100%;
+      width: 0;
+      border-radius: 10px;
+      transition: width 1.8s cubic-bezier(0.25, 0.8, 0.25, 1);
+      background: linear-gradient(90deg, var(--danger), var(--success));
+    }
     #uptime-bar { background: var(--success); }
-    #motd { padding: 15px; background: rgba(0,0,0,0.5); border-radius: 12px; margin: 20px 0; font-size: 1.2em; }
-    #player-list { margin-top: 15px; padding: 12px; background: rgba(0,0,0,0.3); border-radius: 10px; font-size: 1.1em; }
-    #last-update { text-align: center; font-size: 1em; opacity: 0.8; margin: 30px 0; }
+    #motd { padding: 18px; background: rgba(0,0,0,0.55); border-radius: 14px; margin: 25px 0; font-size: 1.25em; line-height: 1.5; transition: all 0.6s ease; }
+    #player-list { margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.35); border-radius: 12px; font-size: 1.15em; transition: all 0.5s; }
+    #last-update { text-align: center; font-size: 1.1em; opacity: 0.85; margin: 40px 0; transition: opacity 0.8s; }
     button {
       display: block;
-      margin: 0 auto 40px;
-      padding: 14px 40px;
+      margin: 0 auto 60px;
+      padding: 16px 50px;
       background: var(--accent);
       color: #000;
       border: none;
-      border-radius: 12px;
-      font-size: 1.2em;
+      border-radius: 14px;
+      font-size: 1.3em;
       font-weight: bold;
       cursor: pointer;
-      box-shadow: 0 6px 20px rgba(0,255,255,0.3);
-      transition: all 0.3s;
+      box-shadow: 0 8px 25px rgba(0,255,255,0.4);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-    button:hover { background: #00cccc; transform: translateY(-3px); }
-    #chart-container { background: var(--card-bg); border-radius: 16px; padding: 30px; box-shadow: var(--shadow); margin-bottom: 50px; }
+    button:hover { background: #00e6e6; transform: scale(1.1); box-shadow: 0 15px 40px rgba(0,255,255,0.6); }
+    #chart-container { background: var(--card); border-radius: 20px; padding: 35px; box-shadow: var(--glow); margin-bottom: 60px; }
   </style>
 </head>
 <body>
@@ -135,7 +169,7 @@
 
   <div class="hero">
     <h1>Blockbound Status Monitor</h1>
-    <div class="subtitle">Real-time stats • Crossplay Java/Bedrock • Bengaluru Low-Ping Vibes</div>
+    <div class="subtitle">Real-time • Crossplay • Bengaluru Low-Ping Energy</div>
   </div>
 
   <div class="container">
@@ -156,7 +190,7 @@
         <div class="card-value" id="version">—</div>
       </div>
       <div class="card">
-        <div class="card-title">Uptime (24h Avg)</div>
+        <div class="card-title">Uptime (24h)</div>
         <div class="card-value" id="uptime">100.00%</div>
       </div>
     </div>
@@ -169,27 +203,27 @@
       </div>
       <div class="section">
         <h2>Live Stats</h2>
-        <p>API Response Time: <span id="response-time">—</span> ms</p>
-        <div class="bar-container"><div id="response-bar" class="bar" style="width: 100%;"></div></div>
-        <p>Uptime Bar:</p>
+        <p>Response Time: <span id="response-time">—</span> ms</p>
+        <div class="bar-container"><div id="response-bar" class="bar"></div></div>
+        <p>Uptime Flow:</p>
         <div class="bar-container"><div id="uptime-bar" class="bar" style="width: 100%;"></div></div>
         <div id="player-list">Players: Loading...</div>
       </div>
     </div>
 
     <div id="chart-container">
-      <h2>Recent Uptime Chart</h2>
+      <h2>Recent Uptime Flow</h2>
       <canvas id="uptimeChart"></canvas>
     </div>
 
     <div id="last-update">Last checked: just now</div>
-    <button onclick="checkServer()">Refresh Now</button>
+    <button onclick="checkServer()">Refresh Flow</button>
   </div>
 
   <script>
     const SERVER = "blockbound.mc-play.org";
     const API = `https://api.mcsrvstat.us/2/${SERVER}`;
-    const MEME = "https://i.imgur.com/4rJ4t.png"; // Your Doge troll
+    const MEME = "https://i.imgur.com/4rJ4t.png"; // Doge troll
 
     let chart;
 
@@ -202,45 +236,57 @@
 
         document.getElementById("last-update").textContent = `Last checked: ${new Date().toLocaleTimeString("en-IN", {timeZone: "Asia/Kolkata"})} IST`;
         document.getElementById("response-time").textContent = respMs;
-        document.getElementById("response-bar").style.width = `${Math.max(20, 100 - (respMs * 2))}%`; // Lower ms = greener/fuller
+        document.getElementById("response-bar").style.width = `${Math.max(30, 100 - respMs * 1.8)}%`;
 
-        const isOnline = data.online;
-        document.getElementById("status-dot").className = `status-dot ${isOnline ? 'online' : 'offline'}`;
-        document.getElementById("status-text").textContent = isOnline ? "ONLINE" : "OFFLINE";
+        const online = data.online;
+        document.getElementById("status-dot").className = `status-dot ${online ? 'online' : 'offline'}`;
+        document.getElementById("status-text").textContent = online ? "ONLINE" : "OFFLINE";
 
-        if (isOnline) {
+        if (online) {
           document.getElementById("players-count").textContent = `${data.players.online} / ${data.players.max}`;
           document.getElementById("version").textContent = data.version || "Unknown";
-          document.getElementById("motd").innerHTML = data.motd?.html || "Welcome to Blockbound!";
+          document.getElementById("motd").innerHTML = data.motd?.html || "Welcome to Blockbound SMP!";
           document.getElementById("player-list").innerHTML = data.players.list?.length 
             ? "Online: " + data.players.list.map(p => p.name).join(", ") 
-            : "No players listed (query may be disabled)";
-          document.getElementById("uptime").textContent = "100.00%"; // Mock - real via mcstatus.io later
+            : "No players listed – query might be off";
+          document.getElementById("uptime").textContent = "100.00%";
         } else {
           document.getElementById("players-count").textContent = "0 / 50";
           document.getElementById("version").textContent = "—";
-          document.getElementById("motd").innerHTML = "Offline for maintenance.<br>Join Discord for updates!";
+          document.getElementById("motd").innerHTML = "Offline / Maintenance Mode<br>Hit Discord for the tea!";
           document.getElementById("player-list").innerHTML = "";
-          document.getElementById("uptime").textContent = "Calculating...";
+          document.getElementById("uptime").textContent = "—";
         }
 
-        updateChart(isOnline ? 100 : 0); // Mock chart update
+        updateChart(online ? 100 : 0);
       } catch (e) {
         document.getElementById("status-text").textContent = "ERROR";
-        document.getElementById("motd").textContent = "API fetch failed 😢";
+        document.getElementById("motd").textContent = "Flow interrupted 😢 Try refresh";
       }
     }
 
-    function updateChart(uptimeVal) {
+    function updateChart(val) {
       const ctx = document.getElementById('uptimeChart').getContext('2d');
       if (chart) chart.destroy();
       chart = new Chart(ctx, {
         type: 'line',
         data: {
           labels: ['-4h', '-3h', '-2h', '-1h', 'Now'],
-          datasets: [{ label: 'Uptime %', data: [99, 100, 98, 100, uptimeVal], borderColor: '#00ff88', tension: 0.3 }]
+          datasets: [{
+            label: 'Uptime Flow',
+            data: [98, 99.5, 97, 100, val],
+            borderColor: '#00ff88',
+            backgroundColor: 'rgba(0,255,136,0.15)',
+            tension: 0.4,
+            pointRadius: 5,
+            pointHoverRadius: 8
+          }]
         },
-        options: { scales: { y: { min: 90, max: 100 } }, plugins: { legend: { display: false } } }
+        options: {
+          animation: { duration: 2000, easing: 'easeOutCubic' },
+          scales: { y: { min: 90, max: 100 } },
+          plugins: { legend: { display: false } }
+        }
       });
     }
 
