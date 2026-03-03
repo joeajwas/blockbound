@@ -177,7 +177,49 @@
     button:hover { background: #00e6e6; transform: scale(1.1); box-shadow: 0 15px 40px rgba(0,255,255,0.6); }
     #chart-container { background: var(--card); border-radius: 20px; padding: 35px; box-shadow: var(--glow); margin-bottom: 60px; }
 
-    /* ── New stylish connection info styles ── */
+    /* Leaderboard styles */
+    .leaderboard {
+      background: rgba(0, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 25px;
+      margin: 30px 0;
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      box-shadow: 0 0 30px rgba(0,255,255,0.2);
+    }
+    .leaderboard h3 {
+      text-align: center;
+      color: var(--accent);
+      margin-bottom: 20px;
+      text-shadow: 0 0 15px var(--accent);
+    }
+    .leader-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 20px;
+      margin: 8px 0;
+      background: rgba(0,0,0,0.4);
+      border-radius: 10px;
+      transition: all 0.3s;
+    }
+    .leader-item:hover {
+      background: rgba(0,255,255,0.15);
+      transform: translateX(5px);
+    }
+    .rank {
+      font-size: 1.4em;
+      font-weight: bold;
+      min-width: 40px;
+      color: #ffd700;
+    }
+    .player-name {
+      flex: 1;
+      font-size: 1.1em;
+    }
+    .score {
+      font-weight: bold;
+      color: var(--success);
+    }
     .connection-info {
       margin-top: 20px;
       padding: 16px;
@@ -266,7 +308,6 @@
         <p>IP: <span id="server-ip" style="color: var(--accent); cursor: pointer;" onclick="navigator.clipboard.writeText('blockbound.mc-play.org'); alert('IP Copied!')">blockbound.mc-play.org</span></p>
         <div id="motd">Loading MOTD...</div>
 
-        <!-- New stylish connection block -->
         <div class="connection-info">
           <div class="ip-line">
             <span class="label">Java IP:</span>
@@ -289,6 +330,40 @@
         <div class="bar-container"><div id="uptime-bar" class="bar" style="width: 100%;"></div></div>
         <div id="player-list">Players: Loading...</div>
       </div>
+    </div>
+
+    <!-- New Leaderboard Section -->
+    <div class="leaderboard" id="leaderboard">
+      <h3>🏆 Player Leaderboard (Top Playtime)</h3>
+      <div id="leader-list">
+        <!-- Mock leaderboard - replace with real later -->
+        <div class="leader-item">
+          <span class="rank">1</span>
+          <span class="player-name">KumarOP 🔥</span>
+          <span class="score">142h 30m</span>
+        </div>
+        <div class="leader-item">
+          <span class="rank">2</span>
+          <span class="player-name">BengaluruBeast</span>
+          <span class="score">118h 45m</span>
+        </div>
+        <div class="leader-item">
+          <span class="rank">3</span>
+          <span class="player-name">NoobSlayer69</span>
+          <span class="score">95h 12m</span>
+        </div>
+        <div class="leader-item">
+          <span class="rank">4</span>
+          <span class="player-name">RedstoneKing</span>
+          <span class="score">82h 05m</span>
+        </div>
+        <div class="leader-item">
+          <span class="rank">5</span>
+          <span class="player-name">CreeperHater</span>
+          <span class="score">71h 55m</span>
+        </div>
+      </div>
+      <p style="text-align: center; margin-top: 15px; opacity: 0.8;">Coming soon: Real-time top stats (playtime, kills, blocks mined...)</p>
     </div>
 
     <div id="charts">
@@ -328,15 +403,22 @@
           document.getElementById("players-count").textContent = `${data.players.online} / ${data.players.max}`;
           document.getElementById("version").textContent = data.version || "Unknown";
           document.getElementById("motd").innerHTML = data.motd?.html || "Welcome to Blockbound SMP!";
-          document.getElementById("player-list").innerHTML = data.players.list?.length 
-            ? "Online: " + data.players.list.map(p => p.name).join(", ") 
-            : "No players listed – query might be off";
+          
+          // Show current online players as "Active"
+          let activeList = "";
+          if (data.players.list && data.players.list.length > 0) {
+            activeList = data.players.list.map(p => p.name).join(", ");
+          } else {
+            activeList = "No one online yet – be the first!";
+          }
+          document.getElementById("player-list").innerHTML = `<strong>Active Players:</strong> ${activeList}`;
+          
           document.getElementById("uptime").textContent = "100.00%";
         } else {
           document.getElementById("players-count").textContent = "0 / 50";
           document.getElementById("version").textContent = "—";
           document.getElementById("motd").innerHTML = "Offline / Maintenance Mode<br>Hit Discord for the tea!";
-          document.getElementById("player-list").innerHTML = "";
+          document.getElementById("player-list").innerHTML = "<strong>Active Players:</strong> Server offline";
           document.getElementById("uptime").textContent = "—";
         }
 
@@ -344,6 +426,7 @@
       } catch (e) {
         document.getElementById("status-text").textContent = "ERROR";
         document.getElementById("motd").textContent = "Flow interrupted 😢 Try refresh";
+        document.getElementById("player-list").innerHTML = "Active Players: Error fetching";
       }
     }
 
