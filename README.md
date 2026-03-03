@@ -1,0 +1,2 @@
+# blockbound
+server status checker
