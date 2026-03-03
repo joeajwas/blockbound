@@ -4,24 +4,30 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Blockbound SMP - Status Monitor</title>
+
+  <!-- Favicon - cyan glowing Minecraft block vibe -->
+  <link rel="icon" href="https://img.icons8.com/fluency/48/00f0ff/minecraft.png" type="image/png">
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
     :root {
       --bg-start: #0a001f;
       --bg-end: #1a0033;
-      --accent: #00ffff;
+      --accent: #00f0ff;
+      --accent-glow: #00ffff;
       --success: #00ff88;
       --danger: #ff4444;
       --text: #e0e0ff;
       --card: rgba(20, 20, 50, 0.88);
-      --glow: 0 0 25px rgba(0, 255, 255, 0.4);
+      --glow: 0 0 25px rgba(0, 240, 255, 0.6);
     }
     body {
       margin: 0;
       font-family: 'Segoe UI', system-ui, sans-serif;
       background: linear-gradient(-45deg, var(--bg-start), var(--bg-end), #2a004d, #0f002e);
       background-size: 400% 400%;
-      animation: flowBg 20s ease infinite;
+      animation: flowBg 18s ease infinite;
       color: var(--text);
       min-height: 100vh;
     }
@@ -31,56 +37,114 @@
       100% { background-position: 0% 50%; }
     }
     header {
-      background: rgba(0,0,0,0.65);
-      backdrop-filter: blur(12px);
-      padding: 15px 30px;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(0,0,0,0.65));
+      backdrop-filter: blur(16px);
+      padding: 20px 50px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       position: sticky;
       top: 0;
-      z-index: 20;
-      box-shadow: 0 6px 25px rgba(0,0,0,0.6);
-      transition: all 0.6s ease;
+      z-index: 100;
+      box-shadow: 0 10px 50px rgba(0, 240, 255, 0.3);
+      border-bottom: 1px solid rgba(0, 240, 255, 0.22);
     }
-    .logo { font-size: 1.7em; font-weight: bold; color: var(--accent); text-shadow: var(--glow); }
-    nav a { 
-      color: var(--text); 
-      margin: 0 22px; 
-      text-decoration: none; 
-      transition: all 0.4s ease; 
+    .logo {
+      font-size: 2.4em;
+      font-weight: 900;
+      background: linear-gradient(90deg, #00f0ff, #9d4edd, #ff6ec7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 40px rgba(0, 240, 255, 0.9);
+      letter-spacing: 3px;
     }
-    nav a:hover { 
-      color: var(--accent); 
-      transform: translateY(-2px); 
-      text-shadow: var(--glow); 
+    nav a {
+      color: var(--text);
+      margin: 0 30px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1.2em;
+      transition: all 0.4s ease;
+      position: relative;
     }
+    nav a:hover,
     nav a.active {
-      color: #00ffff !important;
-      text-shadow: 0 0 15px #00ffff;
-      font-weight: bold;
+      color: var(--accent-glow);
+      text-shadow: 0 0 20px var(--accent-glow);
+    }
+    nav a::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 3px;
+      bottom: -8px;
+      left: 0;
+      background: linear-gradient(90deg, var(--accent), #9d4edd);
+      transition: width 0.4s ease;
+      box-shadow: 0 0 15px var(--accent-glow);
+    }
+    nav a:hover::after,
+    nav a.active::after {
+      width: 100%;
     }
     .discord-btn {
-      padding: 10px 25px;
-      background: #5865F2;
-      border-radius: 10px;
+      padding: 14px 36px;
+      background: linear-gradient(135deg, #5865F2, #7c5eff, #a06bff);
+      border-radius: 14px;
       color: white;
       font-weight: bold;
+      font-size: 1.1em;
       text-decoration: none;
-      box-shadow: 0 5px 18px rgba(88,101,242,0.5);
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 8px 30px rgba(88,101,242,0.7);
+      transition: all 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border: 1px solid rgba(255,255,255,0.25);
     }
-    .discord-btn:hover { transform: scale(1.08) translateY(-3px); box-shadow: 0 10px 30px rgba(88,101,242,0.7); }
+    .discord-btn:hover {
+      transform: scale(1.12) translateY(-4px);
+      box-shadow: 0 15px 50px rgba(88,101,242,0.9);
+    }
     .hero {
       text-align: center;
-      padding: 80px 20px 50px;
-      opacity: 0;
-      transform: translateY(30px);
-      animation: flowIn 1.2s forwards 0.3s ease-out;
+      padding: 160px 20px 100px;
+      position: relative;
+      overflow: hidden;
     }
-    @keyframes flowIn { to { opacity: 1; transform: translateY(0); } }
-    h1 { font-size: 4em; margin: 0; color: var(--accent); text-shadow: var(--glow); }
-    .subtitle { font-size: 1.5em; opacity: 0.9; margin: 15px 0; letter-spacing: 1px; }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%; right: -50%; bottom: -50%;
+      background: radial-gradient(circle at 50% 30%, rgba(0,240,255,0.18) 0%, transparent 70%);
+      animation: pulseGlow 10s infinite alternate;
+      pointer-events: none;
+    }
+    @keyframes pulseGlow {
+      0% { opacity: 0.5; transform: scale(1); }
+      100% { opacity: 1; transform: scale(1.3); }
+    }
+    h1 {
+      font-size: 6em;
+      margin: 0;
+      font-weight: 900;
+      background: linear-gradient(90deg, #00f0ff, #9d4edd, #ff6ec7, #00f0ff);
+      background-size: 400% 400%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gradientFlow 7s ease infinite;
+      text-shadow: 0 0 80px rgba(0, 240, 255, 0.9);
+      letter-spacing: -3px;
+    }
+    @keyframes gradientFlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .subtitle {
+      font-size: 1.9em;
+      opacity: 0.94;
+      margin: 25px 0 0;
+      letter-spacing: 2px;
+      text-shadow: 0 0 20px rgba(0, 240, 255, 0.6);
+    }
     .container { max-width: 1350px; margin: 0 auto; padding: 0 25px; }
     .stats-grid {
       display: grid;
@@ -177,6 +241,48 @@
     button:hover { background: #00e6e6; transform: scale(1.1); box-shadow: 0 15px 40px rgba(0,255,255,0.6); }
     #chart-container { background: var(--card); border-radius: 20px; padding: 35px; box-shadow: var(--glow); margin-bottom: 60px; }
 
+    /* Connection info styles */
+    .connection-info {
+      margin-top: 20px;
+      padding: 16px;
+      background: rgba(0, 255, 255, 0.08);
+      border-radius: 12px;
+      border: 1px solid rgba(0, 255, 255, 0.25);
+      transition: all 0.4s ease;
+    }
+    .connection-info:hover {
+      background: rgba(0, 255, 255, 0.14);
+      box-shadow: 0 0 25px rgba(0, 255, 255, 0.25);
+    }
+    .ip-line {
+      display: flex;
+      align-items: center;
+      margin: 12px 0;
+      font-size: 1.1em;
+      gap: 10px;
+    }
+    .ip-line span.label {
+      min-width: 110px;
+      font-weight: bold;
+      color: #aaaaff;
+    }
+    .ip-line span.value {
+      color: var(--accent);
+      cursor: pointer;
+      text-decoration: underline dotted;
+      transition: all 0.3s;
+    }
+    .ip-line span.value:hover {
+      color: #ffffff;
+      text-shadow: 0 0 12px var(--accent);
+    }
+    .ip-line span.copy-hint {
+      font-size: 0.85em;
+      color: #8888ff;
+      margin-left: 8px;
+      opacity: 0.7;
+    }
+
     /* Leaderboard styles */
     .leaderboard {
       background: rgba(0, 255, 255, 0.08);
@@ -220,49 +326,10 @@
       font-weight: bold;
       color: var(--success);
     }
-    .connection-info {
-      margin-top: 20px;
-      padding: 16px;
-      background: rgba(0, 255, 255, 0.08);
-      border-radius: 12px;
-      border: 1px solid rgba(0, 255, 255, 0.25);
-      transition: all 0.4s ease;
-    }
-    .connection-info:hover {
-      background: rgba(0, 255, 255, 0.14);
-      box-shadow: 0 0 25px rgba(0, 255, 255, 0.25);
-    }
-    .ip-line {
-      display: flex;
-      align-items: center;
-      margin: 12px 0;
-      font-size: 1.1em;
-      gap: 10px;
-    }
-    .ip-line span.label {
-      min-width: 110px;
-      font-weight: bold;
-      color: #aaaaff;
-    }
-    .ip-line span.value {
-      color: var(--accent);
-      cursor: pointer;
-      text-decoration: underline dotted;
-      transition: all 0.3s;
-    }
-    .ip-line span.value:hover {
-      color: #ffffff;
-      text-shadow: 0 0 12px var(--accent);
-    }
-    .ip-line span.copy-hint {
-      font-size: 0.85em;
-      color: #8888ff;
-      margin-left: 8px;
-      opacity: 0.7;
-    }
   </style>
 </head>
 <body>
+
   <header>
     <div class="logo">Blockbound SMP</div>
     <nav>
@@ -275,8 +342,8 @@
   </header>
 
   <div class="hero">
-    <h1>Blockbound Status Monitor</h1>
-    <div class="subtitle">Real-time • Crossplay • Bengaluru Low-Ping Energy</div>
+    <h1>Blockbound</h1>
+    <div class="subtitle">Real-time Status • Crossplay • Bengaluru Low-Ping Vibes</div>
   </div>
 
   <div class="container">
@@ -332,11 +399,10 @@
       </div>
     </div>
 
-    <!-- New Leaderboard Section -->
+    <!-- Leaderboard -->
     <div class="leaderboard" id="leaderboard">
       <h3>🏆 Player Leaderboard (Top Playtime)</h3>
       <div id="leader-list">
-        <!-- Mock leaderboard - replace with real later -->
         <div class="leader-item">
           <span class="rank">1</span>
           <span class="player-name">KumarOP 🔥</span>
@@ -363,7 +429,7 @@
           <span class="score">71h 55m</span>
         </div>
       </div>
-      <p style="text-align: center; margin-top: 15px; opacity: 0.8;">Coming soon: Real-time top stats (playtime, kills, blocks mined...)</p>
+      <p style="text-align: center; margin-top: 15px; opacity: 0.8;">Real stats coming soon (install AJLeaderboards plugin for live top playtime/kills/etc.)</p>
     </div>
 
     <div id="charts">
@@ -404,7 +470,6 @@
           document.getElementById("version").textContent = data.version || "Unknown";
           document.getElementById("motd").innerHTML = data.motd?.html || "Welcome to Blockbound SMP!";
           
-          // Show current online players as "Active"
           let activeList = "";
           if (data.players.list && data.players.list.length > 0) {
             activeList = data.players.list.map(p => p.name).join(", ");
@@ -426,7 +491,7 @@
       } catch (e) {
         document.getElementById("status-text").textContent = "ERROR";
         document.getElementById("motd").textContent = "Flow interrupted 😢 Try refresh";
-        document.getElementById("player-list").innerHTML = "Active Players: Error fetching";
+        document.getElementById("player-list").innerHTML = "<strong>Active Players:</strong> Error fetching";
       }
     }
 
@@ -492,7 +557,6 @@
         }
       });
     });
-
   </script>
 </body>
 </html>
