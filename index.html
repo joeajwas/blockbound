@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Blockbound SMP - Status</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f0f23 0%, #1a0033 100%);
+      color: #e0e0ff;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .container {
+      background: rgba(26, 26, 61, 0.85);
+      backdrop-filter: blur(8px);
+      border-radius: 16px;
+      padding: 40px 30px;
+      width: 90%;
+      max-width: 600px;
+      box-shadow: 0 10px 40px rgba(0, 255, 255, 0.15);
+      text-align: center;
+      border: 1px solid rgba(0, 255, 255, 0.2);
+    }
+    h1 {
+      margin: 0 0 20px;
+      font-size: 2.8em;
+      color: #00ffff;
+      text-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+    }
+    #icon {
+      width: 140px;
+      height: 140px;
+      border-radius: 12px;
+      margin: 20px auto;
+      border: 3px solid #00ffff;
+      box-shadow: 0 0 25px rgba(0, 255, 255, 0.4);
+      background: #111;
+    }
+    .status {
+      font-size: 3.2em;
+      font-weight: bold;
+      margin: 15px 0;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+    }
+    .online { color: #00ff88; text-shadow: 0 0 20px #00ff88; }
+    .offline { color: #ff4444; text-shadow: 0 0 20px #ff4444; }
+    #details {
+      font-size: 1.3em;
+      margin: 20px 0;
+      line-height: 1.6;
+    }
+    #motd {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 12px;
+      border-radius: 8px;
+      margin: 20px 0;
+      font-size: 1.2em;
+    }
+    footer {
+      margin-top: 30px;
+      font-size: 0.95em;
+      opacity: 0.8;
+    }
+    .ping {
+      font-size: 0.9em;
+      margin-top: 25px;
+      color: #aaaaff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Blockbound SMP</h1>
+    
+    <img id="icon" src="https://via.placeholder.com/140?text=Loading..." alt="Server Icon"/>
+    
+    <div id="status" class="status">CHECKING...</div>
+    
+    <div id="details">
+      <div id="players"></div>
+      <div id="version"></div>
+    </div>
+    
+    <div id="motd"></div>
+    
+    <footer>
+      blockbound.mc-play.org • Java + Bedrock (Geyser) • Bengaluru Low-Ping Vibes
+    </footer>
+    
+    <div class="ping" id="last-update">Last checked: just now</div>
+  </div>
+
+  <script>
+    const SERVER = "blockbound.mc-play.org"; // change port if not default: "blockbound.mc-play.org:25565"
+    const STATUS_API = `https://api.mcsrvstat.us/2/${SERVER}`;
+
+    const iconEl     = document.getElementById("icon");
+    const statusEl   = document.getElementById("status");
+    const playersEl  = document.getElementById("players");
+    const versionEl  = document.getElementById("version");
+    const motdEl     = document.getElementById("motd");
+    const updateEl   = document.getElementById("last-update");
+
+    async function checkServer() {
+      try {
+        const response = await fetch(STATUS_API);
+        const data = await response.json();
+
+        const now = new Date().toLocaleTimeString("en-IN", {timeZone: "Asia/Kolkata"});
+        updateEl.textContent = `Last checked: ${now} IST`;
+
+        if (data.online) {
+          statusEl.textContent = "ONLINE";
+          statusEl.className = "status online";
+
+          iconEl.src = data.icon || "https://via.placeholder.com/140?text=Blockbound";
+          iconEl.alt = "Server Icon";
+
+          playersEl.textContent = `${data.players.online}/${data.players.max} players online`;
+          versionEl.textContent = `Version: ${data.version || "Unknown"}`;
+
+          motdEl.innerHTML = data.motd?.html || "Welcome to Blockbound SMP!";
+        } else {
+          statusEl.textContent = "OFFLINE";
+          statusEl.className = "status offline";
+
+          iconEl.src = "https://via.placeholder.com/140/333333/ffffff?text=Offline";
+          iconEl.alt = "Offline";
+
+          playersEl.textContent = "";
+          versionEl.textContent = "";
+          motdEl.innerHTML = "Server is currently in maintenance or offline.<br>Check Discord for updates!";
+        }
+      } catch (err) {
+        statusEl.textContent = "ERROR";
+        statusEl.className = "status offline";
+        motdEl.textContent = "Couldn't reach status API 😢 Try refreshing.";
+        console.error("Status check failed:", err);
+      }
+    }
+
+    // Run immediately + refresh every 30 seconds
+    checkServer();
+    setInterval(checkServer, 30000);
+  </script>
+</body>
+</html>
