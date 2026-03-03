@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  
-  <!-- Favicon - the one you selected (cyan glowing Minecraft block) -->
+
+  <!-- Favicon - cyan glowing Minecraft block -->
   <link rel="icon" href="https://img.icons8.com/fluency/48/00f0ff/minecraft.png" type="image/png">
 
-  <title>Status Monitor</title>
-  
+  <title>Blockbound SMP - Status Monitor</title>
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
@@ -146,8 +146,6 @@
       letter-spacing: 2px;
       text-shadow: 0 0 20px rgba(0, 240, 255, 0.6);
     }
-
-    /* ── Your existing styles (cards, leaderboard, etc.) continue here ── */
     .container { max-width: 1350px; margin: 0 auto; padding: 0 25px; }
     .stats-grid {
       display: grid;
@@ -244,7 +242,6 @@
     button:hover { background: #00e6e6; transform: scale(1.1); box-shadow: 0 15px 40px rgba(0,255,255,0.6); }
     #chart-container { background: var(--card); border-radius: 20px; padding: 35px; box-shadow: var(--glow); margin-bottom: 60px; }
 
-    /* Connection info styles */
     .connection-info {
       margin-top: 20px;
       padding: 16px;
@@ -286,7 +283,6 @@
       opacity: 0.7;
     }
 
-    /* Leaderboard styles */
     .leaderboard {
       background: rgba(0, 255, 255, 0.08);
       border-radius: 16px;
@@ -359,7 +355,7 @@
         </div>
       </div>
       <div class="card">
-        <div class="card-title">Players Online</div>
+        <div class="card-title">Players Logged In</div>
         <div class="card-value" id="players-count">—</div>
       </div>
       <div class="card">
@@ -367,8 +363,12 @@
         <div class="card-value" id="version">—</div>
       </div>
       <div class="card">
-        <div class="card-title">Uptime (24h)</div>
-        <div class="card-value" id="uptime">100.00%</div>
+        <div class="card-title">Server Uptime</div>
+        <div class="card-value" id="server-uptime">—</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Server Location</div>
+        <div class="card-value" style="font-size: 1.4em;">Bengaluru, India</div>
       </div>
     </div>
 
@@ -469,23 +469,36 @@
 
         if (online) {
           document.getElementById("players-count").textContent = `${data.players.online} / ${data.players.max}`;
+
+          // New: Server Uptime (if API provides "uptime" in seconds, convert to human-readable)
+          let uptimeText = "—";
+          if (data.uptime) {
+            const totalSeconds = data.uptime;
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            uptimeText = `${hours}h ${minutes}m`;
+          }
+          document.getElementById("server-uptime").textContent = uptimeText;
+
           document.getElementById("version").textContent = data.version || "Unknown";
+
           document.getElementById("motd").innerHTML = data.motd?.html || "Welcome to Blockbound SMP!";
-          
+
           let activeList = "";
           if (data.players.list && data.players.list.length > 0) {
             activeList = data.players.list.map(p => p.name).join(", ");
           } else {
             activeList = "No one online yet – be the first!";
           }
-          document.getElementById("player-list").innerHTML = `<strong>Active Players:</strong> ${activeList}`;
-          
+          document.getElementById("player-list").innerHTML = `<strong>Players Logged In:</strong> ${activeList}`;
+
           document.getElementById("uptime").textContent = "100.00%";
         } else {
           document.getElementById("players-count").textContent = "0 / 50";
+          document.getElementById("server-uptime").textContent = "—";
           document.getElementById("version").textContent = "—";
           document.getElementById("motd").innerHTML = "Offline / Maintenance Mode<br>Hit Discord for the tea!";
-          document.getElementById("player-list").innerHTML = "<strong>Active Players:</strong> Server offline";
+          document.getElementById("player-list").innerHTML = "<strong>Players Logged In:</strong> Server offline";
           document.getElementById("uptime").textContent = "—";
         }
 
@@ -493,7 +506,8 @@
       } catch (e) {
         document.getElementById("status-text").textContent = "ERROR";
         document.getElementById("motd").textContent = "Flow interrupted 😢 Try refresh";
-        document.getElementById("player-list").innerHTML = "<strong>Active Players:</strong> Error fetching";
+        document.getElementById("player-list").innerHTML = "<strong>Players Logged In:</strong> Error fetching";
+        document.getElementById("server-uptime").textContent = "—";
       }
     }
 
@@ -525,7 +539,6 @@
     checkServer();
     setInterval(checkServer, 30000);
 
-    // Smooth scrolling for nav links
     document.querySelectorAll('nav a').forEach(anchor => {
       anchor.addEventListener('click', function(e) {
         e.preventDefault();
@@ -542,7 +555,6 @@
       });
     });
 
-    // Highlight active nav link on scroll
     window.addEventListener('scroll', () => {
       const sections = ['status', 'players', 'info', 'charts'];
       let current = '';
