@@ -447,7 +447,7 @@
 
   <script>
     const SERVER = "blockbound.mc-play.org";
-    const API = `https://api.mcsrvstat.us/2/${SERVER}`;
+    const API = `https://api.mcstatus.io/v2/status/java/${SERVER}`;
     const MEME = "https://i.imgur.com/4rJ4t.png"; // Doge troll
 
     let chart;
@@ -470,25 +470,23 @@
         if (online) {
           document.getElementById("players-count").textContent = `${data.players.online} / ${data.players.max}`;
 
-          // New: Server Uptime (if API provides "uptime" in seconds, convert to human-readable)
+          // Server uptime (in human-readable format)
           let uptimeText = "—";
           if (data.uptime) {
-            const totalSeconds = data.uptime;
-            const hours = Math.floor(totalSeconds / 3600);
-            const minutes = Math.floor((totalSeconds % 3600) / 60);
-            uptimeText = `${hours}h ${minutes}m`;
+            const totalSec = data.uptime;
+            const h = Math.floor(totalSec / 3600);
+            const m = Math.floor((totalSec % 3600) / 60);
+            uptimeText = `${h}h ${m}m`;
           }
           document.getElementById("server-uptime").textContent = uptimeText;
 
-          document.getElementById("version").textContent = data.version || "Unknown";
+          document.getElementById("version").textContent = data.version.name_clean || data.version.name || "Unknown";
 
-          document.getElementById("motd").innerHTML = data.motd?.html || "Welcome to Blockbound SMP!";
+          document.getElementById("motd").innerHTML = data.motd.html || "Welcome to Blockbound SMP!";
 
-          let activeList = "";
+          let activeList = "No one online yet – join us!";
           if (data.players.list && data.players.list.length > 0) {
-            activeList = data.players.list.map(p => p.name).join(", ");
-          } else {
-            activeList = "No one online yet – be the first!";
+            activeList = data.players.list.map(p => p.name_clean || p.name).join(", ");
           }
           document.getElementById("player-list").innerHTML = `<strong>Players Logged In:</strong> ${activeList}`;
 
@@ -497,17 +495,18 @@
           document.getElementById("players-count").textContent = "0 / 50";
           document.getElementById("server-uptime").textContent = "—";
           document.getElementById("version").textContent = "—";
-          document.getElementById("motd").innerHTML = "Offline / Maintenance Mode<br>Hit Discord for the tea!";
+          document.getElementById("motd").innerHTML = "Server is currently offline / in maintenance<br>Check Discord for updates!";
           document.getElementById("player-list").innerHTML = "<strong>Players Logged In:</strong> Server offline";
           document.getElementById("uptime").textContent = "—";
         }
 
         updateChart(online ? 100 : 0);
-      } catch (e) {
+      } catch (err) {
         document.getElementById("status-text").textContent = "ERROR";
-        document.getElementById("motd").textContent = "Flow interrupted 😢 Try refresh";
-        document.getElementById("player-list").innerHTML = "<strong>Players Logged In:</strong> Error fetching";
+        document.getElementById("motd").innerHTML = "Couldn't reach status API 😢<br>Refresh or check connection.";
+        document.getElementById("player-list").innerHTML = "<strong>Players Logged In:</strong> Error";
         document.getElementById("server-uptime").textContent = "—";
+        console.error("API error:", err);
       }
     }
 
