@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Blockbound SMP - Status Monitor</title>
-
-  <!-- Favicon - cyan glowing Minecraft block vibe -->
+  
+  <!-- Favicon - the one you selected (cyan glowing Minecraft block) -->
   <link rel="icon" href="https://img.icons8.com/fluency/48/00f0ff/minecraft.png" type="image/png">
 
+  <title>Blockbound SMP - Status Monitor</title>
+  
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
@@ -145,6 +146,8 @@
       letter-spacing: 2px;
       text-shadow: 0 0 20px rgba(0, 240, 255, 0.6);
     }
+
+    /* ── Your existing styles (cards, leaderboard, etc.) continue here ── */
     .container { max-width: 1350px; margin: 0 auto; padding: 0 25px; }
     .stats-grid {
       display: grid;
@@ -399,7 +402,6 @@
       </div>
     </div>
 
-    <!-- Leaderboard -->
     <div class="leaderboard" id="leaderboard">
       <h3>🏆 Player Leaderboard (Top Playtime)</h3>
       <div id="leader-list">
