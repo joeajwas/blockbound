@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <!-- PWA + Favicon -->
+  <link rel="icon" href="https://img.icons8.com/fluency/48/00f0ff/minecraft.png?v=5" type="image/png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#00f0ff">
+
+  <title>Blockbound SMP • Live Status</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --bg: linear-gradient(-45deg, #0a001f, #1a0033, #2a004d, #0f002e);
+      --card: rgba(20, 20, 50, 0.92);
+      --text: #e0e0ff;
+      --accent: #00f0ff;
+      --accent-dark: #0099aa;
+      --glow: 0 0 25px rgba(0, 240, 255, 0.6);
+      --success: #00ff88;
+      --danger: #ff4444;
+    }
+
+    [data-theme="purple"] {
+      --bg: linear-gradient(-45deg, #1a001f, #2a0033, #3a004d, #1f002e);
+      --accent: #c084fc;
+      --accent-dark: #a855f7;
+      --glow: 0 0 25px rgba(192, 132, 252, 0.6);
+    }
+
+    [data-theme="green"] {
+      --bg: linear-gradient(-45deg, #001f0f, #00331a, #004d2a, #002e1f);
+      --accent: #34d399;
+      --accent-dark: #10b981;
+      --glow: 0 0 25px rgba(52, 211, 153, 0.6);
+    }
+
+    [data-theme="orange"] {
+      --bg: linear-gradient(-45deg, #1f0a00, #331a00, #4d2a00, #2e1f00);
+      --accent: #fb923c;
+      --accent-dark: #f97316;
+      --glow: 0 0 25px rgba(251, 146, 60, 0.6);
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      background-size: 400% 400%;
+      animation: flowBg 22s ease infinite;
+      color: var(--text);
+      min-height: 100vh;
+      transition: background 0.8s ease;
+    }
+
+    @keyframes flowBg {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    header {
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(16px);
+      padding: 14px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 25px rgba(0,0,0,0.5);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      animation: fadeInDown 0.8s ease-out;
+    }
+
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .logo {
+      font-size: 2.1em;
+      font-weight: 900;
+      background: linear-gradient(90deg, var(--accent), #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: var(--glow);
+      letter-spacing: 2px;
+      animation: glowPulse 3s infinite alternate;
+    }
+
+    @keyframes glowPulse {
+      0% { text-shadow: 0 0 10px var(--accent); }
+      100% { text-shadow: 0 0 30px var(--accent); }
+    }
+
+    nav {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    nav a {
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1em;
+      position: relative;
+      padding: 6px 0;
+      transition: all 0.4s ease;
+    }
+
+    nav a:hover, nav a.active {
+      color: var(--accent);
+      text-shadow: 0 0 15px var(--accent);
+      transform: translateY(-2px);
+    }
+
+    nav a::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -5px;
+      left: 0;
+      background: var(--accent);
+      transition: width 0.4s ease;
+      box-shadow: 0 0 10px var(--accent);
+    }
+
+    nav a:hover::after, nav a.active::after { width: 100%; }
+
+    .theme-switcher {
+      display: flex;
+      gap: 8px;
+    }
+
+    .theme-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid var(--text);
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 0 12px rgba(0,0,0,0.4);
+    }
+
+    .theme-btn:hover { transform: scale(1.2); box-shadow: 0 0 20px var(--accent); }
+
+    .discord-btn {
+      padding: 10px 24px;
+      background: linear-gradient(135deg, #5865F2, #7c5eff);
+      border-radius: 12px;
+      color: white;
+      font-weight: bold;
+      text-decoration: none;
+      box-shadow: 0 6px 20px rgba(88,101,242,0.6);
+      transition: all 0.4s;
+      animation: pulseBtn 2s infinite;
+    }
+
+    @keyframes pulseBtn {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.04); }
+    }
+
+    .discord-btn:hover { transform: scale(1.1); box-shadow: 0 10px 30px rgba(88,101,242,0.8); }
+
+    .hero {
+      text-align: center;
+      padding: 100px 15px 60px;
+      animation: fadeIn 1.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      font-size: 5em;
+      margin: 0;
+      font-weight: 900;
+      background: linear-gradient(90deg, var(--accent), #c084fc, #ff6ec7, var(--accent));
+      background-size: 400%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gradientFlow 8s ease infinite;
+      text-shadow: 0 0 70px var(--glow);
+    }
+
+    @keyframes gradientFlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .subtitle {
+      font-size: 1.5em;
+      opacity: 0.94;
+      margin: 15px 0 30px;
+      letter-spacing: 1.5px;
+      text-shadow: 0 0 18px var(--glow);
+    }
+
+    .server-icon {
+      width: 100px;
+      height: 100px;
+      border-radius: 16px;
+      margin: 0 auto 20px;
+      border: 4px solid var(--accent);
+      box-shadow: 0 0 40px var(--glow);
+      animation: spinGlow 10s linear infinite;
+      object-fit: cover;
+    }
+
+    @keyframes spinGlow {
+      0% { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(180deg) scale(1.05); }
+      100% { transform: rotate(360deg) scale(1); }
+    }
+
+    .container { max-width: 1400px; margin: 0 auto; padding: 0 15px; }
+
+    /* ... rest of your styles (cards, sections, leaderboard, etc.) remain here ... */
+
+    /* Loading spinner */
+    .loading {
+      position: fixed;
+      inset: 0;
+      background: rgba(10,0,31,0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s;
+    }
+
+    .loading.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border: 6px solid var(--accent);
+      border-top: 6px solid transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      box-shadow: 0 0 30px var(--glow);
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Toast notification */
+    #toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,240,255,0.9);
+      color: #000;
+      padding: 12px 30px;
+      border-radius: 12px;
+      font-weight: bold;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+      opacity: 0;
+      transition: all 0.5s;
+      z-index: 1000;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-10px);
+    }
+
+    /* Scroll progress bar */
+    #progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 4px;
+      background: var(--accent);
+      width: 0%;
+      z-index: 999;
+      box-shadow: 0 0 15px var(--accent);
+      transition: width 0.1s linear;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="progress-bar"></div>
+  <div id="loading" class="loading"><div class="spinner"></div></div>
+  <div id="toast">Copied!</div>
+
+  <header>
+    <div class="logo">Blockbound SMP</div>
+    <nav>
+      <a href="#status">Status</a>
+      <a href="#players">Players</a>
+      <a href="#info">Info</a>
+      <a href="#charts">Charts</a>
+    </nav>
+    <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+      <div class="theme-switcher">
+        <div class="theme-btn" style="background:#00f0ff" onclick="setTheme('default')"></div>
+        <div class="theme-btn" style="background:#c084fc" onclick="setTheme('purple')"></div>
+        <div class="theme-btn" style="background:#34d399" onclick="setTheme('green')"></div>
+        <div class="theme-btn" style="background:#fb923c" onclick="setTheme('orange')"></div>
+      </div>
+      <a href="https://discord.gg/Z4kMaU9bPY" target="_blank" class="discord-btn">Join Discord</a>
+    </div>
+  </header>
+
+  <div class="hero">
+    <img id="server-icon" src="https://i.imgur.com/4rJ4t.png" alt="Server Icon">
+    <h1>Blockbound</h1>
+    <div class="subtitle">Real-time Status • Crossplay • Bengaluru Low-Ping Vibes</div>
+    <button id="join-btn" style="display:none;">Join Server Now 🚀</button>
+    <button id="install-btn" style="display:none;">Install App</button>
+  </div>
+
+  <div class="container">
+    <!-- Your existing stats-grid, sections-grid, leaderboard, charts, etc. go here -->
+    <!-- ... paste your current content blocks ... -->
+
+    <div id="last-update">Last checked: just now</div>
+    <div style="text-align:center; margin:30px 0;">
+      <button onclick="checkServer()">Refresh Now</button>
+      <button id="refresh-toggle" onclick="toggleAutoRefresh()">Pause Auto-Refresh</button>
+    </div>
+  </div>
+
+  <script>
+    // ── Your existing checkServer, updateChart, toggleAutoRefresh, nav scroll code ──
+    // ... paste them here ...
+
+    // ── New PWA + Theme + Animations ──
+
+    // Theme switcher
+    function setTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('blockbound-theme', theme);
+    }
+
+    // Load saved theme
+    const savedTheme = localStorage.getItem('blockbound-theme') || 'default';
+    setTheme(savedTheme);
+
+    // Scroll progress bar
+    window.addEventListener('scroll', () => {
+      const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = (winScroll / height) * 100;
+      document.getElementById("progress-bar").style.width = scrolled + "%";
+    });
+
+    // Toast notification
+    function showToast(message = "Copied!") {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2500);
+    }
+
+    // Override copy functions to show toast
+    const originalCopy = navigator.clipboard.writeText;
+    navigator.clipboard.writeText = async (text) => {
+      await originalCopy(text);
+      showToast();
+    };
+
+    // Show loading spinner during fetch
+    const loading = document.getElementById("loading");
+    const originalFetch = window.fetch;
+    window.fetch = async (...args) => {
+      loading.classList.add("active");
+      try {
+        return await originalFetch(...args);
+      } finally {
+        loading.classList.remove("active");
+      }
+    };
+
+    // PWA install prompt
+    let deferredPrompt;
+    const installBtn = document.getElementById("install-btn");
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.style.display = 'inline-block';
+    });
+
+    installBtn.addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        deferredPrompt = null;
+        installBtn.style.display = 'none';
+      }
+    });
+
+    // Service Worker registration
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .catch(err => console.log('SW registration failed:', err));
+      });
+    }
+
+    // Start checking
+    checkServer();
+    setInterval(checkServer, 30000);
+  </script>
+</body>
+</html>
