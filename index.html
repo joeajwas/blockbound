@@ -58,6 +58,7 @@
       
       /* Status colors */
       --success: #10b981;
+      --warning: #f59e0b;
       --danger: #ef4444;
       --gold: #fbbf24;
       
@@ -883,7 +884,53 @@
       border: 1px solid rgba(255, 68, 68, 0.2);
     }
 
-    /* ===== SIMPLE LEADERBOARD - W.I.P ===== */
+    /* ===== STATUS BARS SECTION ===== */
+    .status-bars {
+      margin-top: 20px;
+    }
+
+    .status-bar-item {
+      background: var(--bg-tertiary);
+      border-radius: 16px;
+      padding: 15px;
+      margin-bottom: 10px;
+    }
+
+    .status-bar-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .status-bar-header i {
+      color: var(--accent-primary);
+      margin-right: 8px;
+    }
+
+    .status-bar-container {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .status-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--accent-gradient);
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+
+    .tps-bar-fill {
+      height: 100%;
+      width: 100%;
+      background: var(--success);
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+
+    /* ===== LEADERBOARD WIP ===== */
     .leaderboard-card {
       background: var(--bg-card);
       backdrop-filter: blur(12px);
@@ -1747,28 +1794,53 @@
               <div class="player-names" id="playerNames">No players online</div>
             </div>
 
-            <!-- Server Performance -->
-            <div style="margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-              <div style="background: var(--bg-tertiary); border-radius: 16px; padding: 15px;">
-                <div class="stat-label">CPU</div>
-                <div style="font-weight: 700;">Ryzen 5 5600X</div>
-                <div style="color: var(--text-secondary); font-size: 0.8rem;">6-Core 4.6GHz</div>
+            <!-- STATUS BARS - CPU, RAM, TPS -->
+            <div class="status-bars">
+              <!-- CPU Usage Bar -->
+              <div class="status-bar-item">
+                <div class="status-bar-header">
+                  <span><i class="fas fa-microchip"></i> CPU Usage</span>
+                  <span><span id="cpuPercent">8</span>%</span>
+                </div>
+                <div class="status-bar-container">
+                  <div class="status-bar-fill" id="cpuBar" style="width: 8%;"></div>
+                </div>
               </div>
-              <div style="background: var(--bg-tertiary); border-radius: 16px; padding: 15px;">
-                <div class="stat-label">Storage</div>
-                <div style="font-weight: 700;">32GB NVMe</div>
-                <div style="color: var(--text-secondary); font-size: 0.8rem;">SSD</div>
+              
+              <!-- RAM Usage Bar -->
+              <div class="status-bar-item">
+                <div class="status-bar-header">
+                  <span><i class="fas fa-memory"></i> RAM (DDR5)</span>
+                  <span><span id="ramUsed">2.1</span>/16 GB</span>
+                </div>
+                <div class="status-bar-container">
+                  <div class="status-bar-fill" id="ramBar" style="width: 13%;"></div>
+                </div>
+              </div>
+              
+              <!-- TPS Bar -->
+              <div class="status-bar-item">
+                <div class="status-bar-header">
+                  <span><i class="fas fa-tachometer-alt"></i> TPS</span>
+                  <span><span id="tpsValue">20.0</span>/20</span>
+                </div>
+                <div class="status-bar-container">
+                  <div class="tps-bar-fill" id="tpsBar" style="width: 100%;"></div>
+                </div>
               </div>
             </div>
 
-            <!-- RAM Usage -->
-            <div style="margin-top: 15px; padding: 15px; background: var(--bg-tertiary); border-radius: 16px;">
-              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                <span><i class="fas fa-memory" style="color: var(--accent-primary);"></i> RAM (DDR5)</span>
-                <span><span id="ramUsed">2.1</span>/16 GB</span>
+            <!-- Server Performance Info -->
+            <div style="margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div style="background: var(--bg-tertiary); border-radius: 12px; padding: 12px; text-align: center;">
+                <div class="stat-label">CPU</div>
+                <div style="font-weight: 600;">Ryzen 5 5600X</div>
+                <div style="color: var(--text-secondary); font-size: 0.8rem;">6-Core 4.6GHz</div>
               </div>
-              <div style="height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
-                <div id="ramBar" style="width: 13%; height: 100%; background: var(--accent-gradient); transition: width 0.5s;"></div>
+              <div style="background: var(--bg-tertiary); border-radius: 12px; padding: 12px; text-align: center;">
+                <div class="stat-label">Storage</div>
+                <div style="font-weight: 600;">32GB NVMe</div>
+                <div style="color: var(--text-secondary); font-size: 0.8rem;">SSD</div>
               </div>
             </div>
           </div>
@@ -1803,7 +1875,7 @@
             </div>
           </div>
 
-          <!-- Server Specs -->
+          <!-- Server Specs Summary -->
           <div class="info-card" style="margin-top: 20px;">
             <div class="card-header">
               <i class="fas fa-microchip"></i>
@@ -2091,6 +2163,7 @@
           document.getElementById('onlineCount').textContent = players;
           document.getElementById('footerPlayers').textContent = players;
           document.getElementById('version').textContent = data.version || '1.21.x';
+          document.getElementById('uptime').textContent = data.uptime ? Math.floor(data.uptime / 3600) + 'h' : '—';
           document.getElementById('motd').innerHTML = data.motd?.html || 'Welcome to Blockbound SMP!';
           
           // Player list
@@ -2104,7 +2177,8 @@
             playerNamesEl.innerHTML = 'No players online';
           }
           
-          updateRAMUsage(players);
+          // Update all status bars
+          updateStatusBars(players);
         } else {
           showOfflineUI();
         }
@@ -2121,16 +2195,39 @@
       document.getElementById('onlineCount').textContent = '0';
       document.getElementById('footerPlayers').textContent = '0';
       document.getElementById('version').textContent = '—';
+      document.getElementById('uptime').textContent = '—';
       document.getElementById('motd').innerHTML = 'Server offline';
       document.getElementById('playerNames').innerHTML = 'Server offline';
-      updateRAMUsage(0);
+      updateStatusBars(0);
     }
 
-    function updateRAMUsage(players) {
-      const used = (2.1 + (players * 0.3)).toFixed(1);
-      const percent = (used / CONFIG.totalRAM) * 100;
-      document.getElementById('ramUsed').textContent = used;
-      document.getElementById('ramBar').style.width = `${percent}%`;
+    function updateStatusBars(players) {
+      // RAM calculation: 2.1GB base + 0.3GB per player
+      const ramUsed = (2.1 + (players * 0.3)).toFixed(1);
+      const ramPercent = (ramUsed / CONFIG.totalRAM) * 100;
+      document.getElementById('ramUsed').textContent = ramUsed;
+      document.getElementById('ramBar').style.width = Math.min(ramPercent, 100) + '%';
+      
+      // CPU calculation: 5% base + 2% per player (capped at 40%)
+      const cpuPercent = Math.min(5 + (players * 2), 40).toFixed(0);
+      document.getElementById('cpuPercent').textContent = cpuPercent;
+      document.getElementById('cpuBar').style.width = cpuPercent + '%';
+      
+      // TPS calculation: 20.0 base, slight random variation
+      const tps = (19.8 + (Math.random() * 0.4)).toFixed(1);
+      document.getElementById('tpsValue').textContent = tps;
+      const tpsPercent = (tps / 20) * 100;
+      document.getElementById('tpsBar').style.width = tpsPercent + '%';
+      
+      // Color code TPS bar
+      const tpsBar = document.getElementById('tpsBar');
+      if (tps >= 19) {
+        tpsBar.style.background = 'var(--success)';
+      } else if (tps >= 15) {
+        tpsBar.style.background = 'var(--gold)';
+      } else {
+        tpsBar.style.background = 'var(--danger)';
+      }
     }
 
     function updateLastUpdate() {
